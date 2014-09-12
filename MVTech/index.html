@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Machine Learning com R</title>
+  <meta charset="utf-8">
+  <meta name="description" content="Machine Learning com R">
+  <meta name="author" content="Taurã Figueiredo">
+  <meta name="generator" content="slidify" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/default.css" media="all" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/phone.css" 
+    media="only screen and (max-device-width: 480px)" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/slidify.css" >
+  <link rel="stylesheet" href="libraries/highlighters/highlight.js/css/tomorrow.css" />
+  <base target="_blank"> <!-- This amazingness opens all links in a new tab. -->  <link rel=stylesheet href="./assets/css/ribbons.css"></link>
+
+  
+  <!-- Grab CDN jQuery, fall back to local if offline -->
+  <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.min.js"></script>
+  <script>window.jQuery || document.write('<script src="libraries/widgets/quiz/js/jquery.js"><\/script>')</script> 
+  <script data-main="libraries/frameworks/io2012/js/slides" 
+    src="libraries/frameworks/io2012/js/require-1.0.8.min.js">
+  </script>
+  
+  
+
+</head>
+<body style="opacity: 0">
+  <slides class="layout-widescreen">
+    
+    <!-- LOGO SLIDE -->
+        <slide class="title-slide segue nobackground">
+  <hgroup class="auto-fadein">
+    <h1>Machine Learning com R</h1>
+    <h2>Human Activity Recognition | MV Tech Day</h2>
+    <p>Taurã Figueiredo<br/>Coordenador de CRM</p>
+  </hgroup>
+  <article></article>  
+</slide>
+    
+
+    <!-- SLIDES -->
+    <slide class="" id="slide-1" style="background:;">
+  <hgroup>
+    <h2>Introdução</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>&quot;Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively inexpensively. These type of devices are part of the quantified self movement – a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. One thing that people regularly do is quantify how much of a particular activity they do, but they rarely quantify how well they do it. In this project, your goal will be to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways.&quot;   </p>
+
+<p>Projeto original: <a href="http://groupware.les.inf.puc-rio.br/har">http://groupware.les.inf.puc-rio.br/har</a></p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id" style="background:;">
+  <hgroup>
+    <h2>Agenda</h2>
+  </hgroup>
+  <article data-timings="">
+    <ol>
+<li>Coletando dados</li>
+<li>Análise exploratória dos dados</li>
+<li>Transformação de dados</li>
+<li>Construção de modelo de predição</li>
+</ol>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id" style="background:;">
+  <hgroup>
+    <h2>Coletando dados</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>Os datasets utilizados para essa apresentação foram disponibilizados como parte do projeto do curso Practical Machine Learning da Johns Hopkins Bloomberg School of Public Health, disponibilizado no Coursera.   </p>
+
+<p>Training dataset: <a href="https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv">https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv</a><br>
+Testing dataset: <a href="https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv">https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv</a></p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id" style="background:;">
+  <hgroup>
+    <h2>Coletando dados</h2>
+  </hgroup>
+  <article data-timings="">
+    <h3>Baixar os datasets e carregar no R</h3>
+
+<pre><code class="r">download.file(url = &quot;https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv&quot;, 
+              destfile = &quot;pml-training.csv&quot;)
+download.file(url = &quot;https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv&quot;, 
+              destfile = &quot;pml-testing.csv&quot;)
+</code></pre>
+
+<pre><code class="r">pmlTraining &lt;- read.csv(&quot;pml-training.csv&quot;)
+pmlTesting &lt;- read.csv(&quot;pml-testing.csv&quot;)
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id" style="background:;">
+  <hgroup>
+    <h2>Análise exploratória dos dados</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>A primeira coisa que precisamos fazer é entender quais dados temos para trabalhar, quais os tipos de dados e como estão distribuídos.   </p>
+
+<p>Vamos começar dando uma olhada geral no que foi carregado:   </p>
+
+<pre><code class="r">dim(pmlTraining)
+</code></pre>
+
+<pre><code>## [1] 19622   160
+</code></pre>
+
+<pre><code class="r">dim(pmlTesting)
+</code></pre>
+
+<pre><code>## [1]  20 160
+</code></pre>
+
+<p>A função &#39;dim&#39; nos mostra a quantidade de itens em cada dimensão de um data frame ou matriz, sendo o primeiro resultado a quantidade de linhas e o segundo a quantidade de colunas.</p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id" style="background:;">
+  <hgroup>
+    <h2>Análise exploratória dos dados</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>Vimos que temos 160 variáveis (ie. colunas) que podemos utilizar na construção do modelo preditivo.   </p>
+
+<p>Mas quais delas são úteis?  </p>
+
+<p>Vamos dar uma olhada nesse dataset:</p>
+
+<pre><code class="r">View(pmlTraining)
+</code></pre>
+
+<p>Outras funções interessantes para explorar os dados que foram carregados:</p>
+
+<ol>
+<li>summary</li>
+<li>head / tail</li>
+</ol>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id" style="background:;">
+  <hgroup>
+    <h2>Transformação de dados</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>Agora que entendemos como os dados estão estruturados, já podemos começar a trabalhar neles.</p>
+
+<h3>Qualidade dos dados</h3>
+
+<ul>
+<li>Existem muitas variáveis sem dados (vazio ou NA)</li>
+<li>Não faz sentido considerar as variáveis que não são números</li>
+</ul>
+
+<p>Precisamos criar um dataset &quot;limpo&quot;, sem essas variáveis.<br>
+Se uma variável tiver mais de 50% de registros inválidos, excluímos ela.</p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id" style="background:;">
+  <hgroup>
+    <h2>Transformação de dados</h2>
+  </hgroup>
+  <article data-timings="">
+    <h3>Pré-processamento dos dados</h3>
+
+<ul>
+<li><p>Toda e qualquer etapa de pré-processamento que for aplicada no dataset de treinamento do modelo de predição DEVERÁ ser aplicada nos datasets de predição.</p></li>
+<li><p>Existem processos automáticos com objetivo de entender a correlação das variáveis e reduzir seu número automaticamente, como PCA e Bagging.</p></li>
+<li><p>Você pode construir sua própria função de pré-processamento.</p></li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class small-size" id="id" style="background:;">
+  <hgroup>
+    <h2>Transformação de dados</h2>
+  </hgroup>
+  <article data-timings="">
+    <pre><code class="r">ProcessData &lt;- function (dataframe){
+  col &lt;- vector(mode = &quot;numeric&quot;)
+  for(i in 1:ncol(dataframe))
+  {
+    if(colnames(dataframe)[i]==&#39;classe&#39;){next;}
+
+    total &lt;- length(dataframe[,i]);
+
+    NAs &lt;- length(dataframe[is.na(dataframe[,i]),i]);
+    empty &lt;- length(dataframe[dataframe[,i]==&#39;&#39;,i])
+    notNumber &lt;- length(dataframe[!is.numeric(dataframe[,i]),i]);
+
+    if(round(NAs/total)==1 | round(empty/total)==1 | round(notNumber/total)==1){
+      col &lt;- rbind(col, i)
+    }
+  }
+
+  process &lt;- dataframe[,as.numeric(col)*(-1)]
+  for(i in 1:(ncol(process)-1)){ process[,i] &lt;- as.numeric(process[,i]); }
+  process[,c(1,2,3,4)*(-1)]
+}
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id" style="background:;">
+  <hgroup>
+    <h2>Transformação de dados</h2>
+  </hgroup>
+  <article data-timings="">
+    <h3>Pré-processar o dataset de treinamento do modelo</h3>
+
+<pre><code class="r">cleanedData &lt;- ProcessData(pmlTraining)
+</code></pre>
+
+<p>Vamos ver como ele ficou:</p>
+
+<pre><code class="r">dim(cleanedData)
+</code></pre>
+
+<pre><code>## [1] 19622    53
+</code></pre>
+
+<p>Reduzimos o número de variáveis de 160 para 53!<br>
+Ou seja, 107 variáveis atrapalhariam a construção do modelo de predição.</p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id" style="background:;">
+  <hgroup>
+    <h2>Construção do modelo de predição</h2>
+  </hgroup>
+  <article data-timings="">
+    <ul>
+<li><p>Pacote Caret   </p></li>
+<li><p>Particionamento dos dados (train set + validation set)   </p></li>
+<li><p>Algorítimos   </p></li>
+<li><p>Cross-validation   </p></li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id" style="background:;">
+  <hgroup>
+    <h2>Construção do modelo de predição</h2>
+  </hgroup>
+  <article data-timings="">
+    <h3>Pacote Caret</h3>
+
+<p>Pacote em R que simplifica o processo de Machine Learning.</p>
+
+<p>Principais funções:</p>
+
+<ul>
+<li>createDataPartition</li>
+<li>train</li>
+<li>predict</li>
+<li>confusionMatrix</li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class small-size" id="id" style="background:;">
+  <hgroup>
+    <h2>Construção do modelo de predição</h2>
+  </hgroup>
+  <article data-timings="">
+    <h3>Particionamento dos dados (train set + validation set)</h3>
+
+<p>Antes de montar o modelo de predição, temos que separar uma parte do dataset de treinamento, onde sabemos a resposta do que deverá ser retornado, para validar o modelo.</p>
+
+<p>Para isso, utilizamos a função &quot;createDataPartition&quot; do pacote caret.</p>
+
+<pre><code class="r">library(caret)
+
+inTrain &lt;- createDataPartition(y = cleanedData$classe, p = 0.7, list = FALSE)
+trainSet &lt;- cleanedData[inTrain,]
+validationSet &lt;- cleanedData[-inTrain,]
+
+dim(trainSet); dim(validationSet)
+</code></pre>
+
+<pre><code>## [1] 13737    53
+</code></pre>
+
+<pre><code>## [1] 5885   53
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+    <slide class="backdrop"></slide>
+  </slides>
+  <div class="pagination pagination-small" id='io2012-ptoc' style="display:none;">
+    <ul>
+      <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=1 title='Introdução'>
+         1
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=2 title='Agenda'>
+         2
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=3 title='Coletando dados'>
+         3
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=4 title='Coletando dados'>
+         4
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=5 title='Análise exploratória dos dados'>
+         5
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=6 title='Análise exploratória dos dados'>
+         6
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=7 title='Transformação de dados'>
+         7
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=8 title='Transformação de dados'>
+         8
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=9 title='Transformação de dados'>
+         9
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=10 title='Transformação de dados'>
+         10
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=11 title='Construção do modelo de predição'>
+         11
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=12 title='Construção do modelo de predição'>
+         12
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=13 title='Construção do modelo de predição'>
+         13
+      </a>
+    </li>
+  </ul>
+  </div>  <!--[if IE]>
+    <script 
+      src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js">  
+    </script>
+    <script>CFInstall.check({mode: 'overlay'});</script>
+  <![endif]-->
+</body>
+  <!-- Load Javascripts for Widgets -->
+  
+  <!-- LOAD HIGHLIGHTER JS FILES -->
+  <script src="libraries/highlighters/highlight.js/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+  <!-- DONE LOADING HIGHLIGHTER JS FILES -->
+   
+  </html>
