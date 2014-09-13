@@ -1,8 +1,8 @@
 ---
 title       : Machine Learning com R
-subtitle    : Human Activity Recognition | MV Tech Day
+subtitle    : Human Activity Recognition
 author      : Taurã Figueiredo
-job         : Coordenador de CRM
+job         : MV Tech Day
 framework   : io2012        # {io2012, html5slides, shower, dzslides, ...}
 highlighter : highlight.js  # {highlight.js, prettify, highlight}
 hitheme     : tomorrow      # 
@@ -25,6 +25,7 @@ Projeto original: http://groupware.les.inf.puc-rio.br/har
 2. Análise exploratória dos dados
 3. Transformação de dados
 4. Construção de modelo de predição
+5. Predicting
 
 --- .class #id 
 
@@ -96,6 +97,9 @@ Vamos dar uma olhada nesse dataset:
 ```r
 View(pmlTraining)
 ```
+
+A variável que queremos "descobrir" é a 'classe'.   
+Ela pode ser A, B, C, D, E.
 
 Outras funções interessantes para explorar os dados que foram carregados:
 
@@ -192,6 +196,8 @@ Ou seja, 107 variáveis atrapalhariam a construção do modelo de predição.
 * Particionamento dos dados (train set + validation set)   
    
 * Algorítimos   
+
+* Treinar o modelo
    
 * Cross-validation   
 
@@ -238,6 +244,133 @@ dim(trainSet); dim(validationSet)
 ## [1] 5885   53
 ```
 
+--- .class #id
+
+## Construção do modelo de predição
+
+### Algorítimos
+
+* Linear model (lm)
+* Generalized linear model (glm)
+* Random Forest (rf)
+* Boosting (gbm)
+
+--- .class #id
+
+## Construção do modelo de predição
+
+### Treinar o modelo
+
+Existem basicamente duas formas de treinar o modelo:
+
+1. Utilizando a função 'train' do pacote caret
+2. Utilizando a função de treinamento do modelo específico
+
+Por exemplo, para treinar nossa base com Random Forest, temos essas duas opções:
+
+```r
+library(caret)
+fit <- train(classe ~ ., data = trainSet, method = 'rf')
+```
+
+```r
+library(randomForest)
+fit <- randomForest(classe ~ ., data = trainSet)
+```
+
+--- .class #id
+
+## Construção do modelo de predição
+
+### Cross-validation
+
+Ok. Modelo construído. Hora de ver se ele funciona.
+
+Para isso, temos a função 'confusionMatrix' do pacote caret.
+
+
+```r
+predictResult <- predict(fit, validationSet[,-53])
+confusionMatrix(validationSet[,53], predictResult)
+```
+
+--- .class #id .small-size11
+
+## Construção do modelo de predição
+
+
+```
+## Confusion Matrix and Statistics
+## 
+##           Reference
+## Prediction    A    B    C    D    E
+##          A 1673    1    0    0    0
+##          B    8 1128    3    0    0
+##          C    0    8 1014    4    0
+##          D    0    0    8  956    0
+##          E    0    0    0    1 1081
+## 
+## Overall Statistics
+##                                         
+##                Accuracy : 0.994         
+##                  95% CI : (0.992, 0.996)
+##     No Information Rate : 0.286         
+##     P-Value [Acc > NIR] : <2e-16        
+##                                         
+##                   Kappa : 0.993         
+##  Mcnemar's Test P-Value : NA            
+## 
+## Statistics by Class:
+## 
+##                      Class: A Class: B Class: C Class: D Class: E
+## Sensitivity             0.995    0.992    0.989    0.995    1.000
+## Specificity             1.000    0.998    0.998    0.998    1.000
+## Pos Pred Value          0.999    0.990    0.988    0.992    0.999
+## Neg Pred Value          0.998    0.998    0.998    0.999    1.000
+## Prevalence              0.286    0.193    0.174    0.163    0.184
+## Detection Rate          0.284    0.192    0.172    0.162    0.184
+## Detection Prevalence    0.284    0.194    0.174    0.164    0.184
+## Balanced Accuracy       0.998    0.995    0.993    0.997    1.000
+```
+
+--- .class #id
+
+## Predicting
+
+Logo no começo, carregamos um dataset de teste (pmlTesting) no mesmo formato que o de treinamento (pmlTraining).
+
+Como premissa, temos que aplicar as mesmas etapas de pré-processamento no dataset de teste:
 
 
 
+
+```r
+cleanedTest <- ProcessData(pmlTesting)
+```
+
+Em seguida, é só usar a função 'predict' do pacote caret:
+
+```r
+predict(fit, cleanedTest)
+```
+
+```
+##  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 
+##  B  A  B  A  A  E  D  B  A  A  B  C  B  A  E  E  A  B  B  B 
+## Levels: A B C D E
+```
+
+--- .class #id
+
+## Considerações finais
+
+* O que aconteceria se não tivéssemos pré-processado o dataset?
+
+* Apesar do resultado ser praticamente o mesmo, vale avaliar a performance de se utilizar a função 'train' ou a função do algoritmo original.
+
+* Muitas vezes podemos utilizar mais de um algoritmo para melhorar a precisão da predição.
+
+
+### Dúvidas? :)
+http://br.linkedin.com/in/taurafigueiredo   
+taurafigueiredo@minhavida.com.br

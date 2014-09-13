@@ -1,7 +1,9 @@
 base
 caret
 devtools
+e1071
 ggplot2
 knitr
 lattice
+randomForest
 slidify

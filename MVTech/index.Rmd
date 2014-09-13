@@ -1,8 +1,8 @@
 ---
 title       : Machine Learning com R
-subtitle    : Human Activity Recognition | MV Tech Day
+subtitle    : Human Activity Recognition
 author      : Taurã Figueiredo
-job         : Coordenador de CRM
+job         : MV Tech Day
 framework   : io2012        # {io2012, html5slides, shower, dzslides, ...}
 highlighter : highlight.js  # {highlight.js, prettify, highlight}
 hitheme     : tomorrow      # 
@@ -25,6 +25,7 @@ Projeto original: http://groupware.les.inf.puc-rio.br/har
 2. Análise exploratória dos dados
 3. Transformação de dados
 4. Construção de modelo de predição
+5. Predicting
 
 --- .class #id 
 
@@ -81,6 +82,9 @@ Vamos dar uma olhada nesse dataset:
 ```{r tidy=FALSE, eval=FALSE}
 View(pmlTraining)
 ```
+
+A variável que queremos "descobrir" é a 'classe'.   
+Ela pode ser `r unique(pmlTraining$classe)`.
 
 Outras funções interessantes para explorar os dados que foram carregados:
 
@@ -170,6 +174,8 @@ Ou seja, `r ncol(pmlTraining)-ncol(cleanedData)` variáveis atrapalhariam a cons
 * Particionamento dos dados (train set + validation set)   
    
 * Algorítimos   
+
+* Treinar o modelo
    
 * Cross-validation   
 
@@ -207,6 +213,94 @@ validationSet <- cleanedData[-inTrain,]
 dim(trainSet); dim(validationSet)
 ```
 
+--- .class #id
+
+## Construção do modelo de predição
+
+### Algorítimos
+
+* Linear model (lm)
+* Generalized linear model (glm)
+* Random Forest (rf)
+* Boosting (gbm)
+
+--- .class #id
+
+## Construção do modelo de predição
+
+### Treinar o modelo
+
+Existem basicamente duas formas de treinar o modelo:
+
+1. Utilizando a função 'train' do pacote caret
+2. Utilizando a função de treinamento do modelo específico
+
+Por exemplo, para treinar nossa base com Random Forest, temos essas duas opções:
+```{r eval=FALSE}
+library(caret)
+fit <- train(classe ~ ., data = trainSet, method = 'rf')
+``` 
+```{r cache=TRUE}
+library(randomForest)
+fit <- randomForest(classe ~ ., data = trainSet)
+```
+
+--- .class #id
+
+## Construção do modelo de predição
+
+### Cross-validation
+
+Ok. Modelo construído. Hora de ver se ele funciona.
+
+Para isso, temos a função 'confusionMatrix' do pacote caret.
+
+```{r eval=FALSE}
+predictResult <- predict(fit, validationSet[,-53])
+confusionMatrix(validationSet[,53], predictResult)
+```
+
+--- .class #id .small-size11
+
+## Construção do modelo de predição
+
+```{r echo=FALSE}
+predictResult <- predict(fit, validationSet[,-53])
+confusionMatrix(validationSet[,53], predictResult)
+```
+
+--- .class #id
+
+## Predicting
+
+Logo no começo, carregamos um dataset de teste (pmlTesting) no mesmo formato que o de treinamento (pmlTraining).
+
+Como premissa, temos que aplicar as mesmas etapas de pré-processamento no dataset de teste:
+
+```{r echo=FALSE}
+pmlTesting <- pmlTesting[,-160]
+```
+
+```{r}
+cleanedTest <- ProcessData(pmlTesting)
+```
+
+Em seguida, é só usar a função 'predict' do pacote caret:
+```{r}
+predict(fit, cleanedTest)
+```
+
+--- .class #id
+
+## Considerações finais
+
+* O que aconteceria se não tivéssemos pré-processado o dataset?
+
+* Apesar do resultado ser praticamente o mesmo, vale avaliar a performance de se utilizar a função 'train' ou a função do algoritmo original.
+
+* Muitas vezes podemos utilizar mais de um algoritmo para melhorar a precisão da predição.
 
 
-
+### Dúvidas? :)
+http://br.linkedin.com/in/taurafigueiredo   
+taurafigueiredo@minhavida.com.br
