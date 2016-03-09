@@ -1,4 +1,4 @@
----
+﻿---
 title       : Machine Learning com R
 subtitle    : Human Activity Recognition
 author      : Taurã Figueiredo
